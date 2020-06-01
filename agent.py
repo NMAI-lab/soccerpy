@@ -4,10 +4,10 @@ import threading
 import time
 import random
 
-import sock
-import sp_exceptions
-import handler
-from world_model import WorldModel
+from . import sock
+from . import sp_exceptions
+from . import handler
+from .world_model import WorldModel
 
 class Agent:
     def __init__(self):
