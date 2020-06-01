@@ -26,10 +26,10 @@ class Agent:
 
         # parse thread and control variable
         self.__parsing = False
-        self.__msg_thread = None
+        self._msg_thread = None
 
-        self.__thinking = False # think thread and control variable
-        self.__think_thread = None
+        self.__thinking = False  # think thread and control variable
+        self._think_thread = None
 
         # whether we should run the think method
         self.__should_think_on_data = False
@@ -63,20 +63,21 @@ class Agent:
         self.msg_handler = handler.MessageHandler(self.wm)
 
         # set up our threaded message receiving system
-        self.__parsing = True # tell thread that we're currently running
-        self.__msg_thread = threading.Thread(target=self.__message_loop,
-                name="message_loop")
-        self.__msg_thread.daemon = True # dies when parent thread dies
-
-        # start processing received messages. this will catch the initial server
-        # response and all subsequent communication.
-        self.__msg_thread.start()
+        self.__parsing = True  # tell thread that we're currently running
 
         # send the init message and allow the message handler to handle further
         # responses.
         init_address = self.__sock.address
         init_msg = "(init %s (version %d))"
         self.__sock.send(init_msg % (teamname, version))
+
+        self._msg_thread = threading.Thread(target=self.__message_loop,
+                                            name="message_loop")
+        self._msg_thread.daemon = True  # dies when parent thread dies
+
+        # start processing received messages. this will catch the initial server
+        # response and all subsequent communication.
+        self._msg_thread.start()
 
         # wait until the socket receives a response from the server and gets its
         # assigned port.
@@ -86,9 +87,9 @@ class Agent:
         # create our thinking thread.  this will perform the actions necessary
         # to play a game of robo-soccer.
         self.__thinking = False
-        self.__think_thread = threading.Thread(target=self.__think_loop,
-                name="think_loop")
-        self.__think_thread.daemon = True
+        self._think_thread = threading.Thread(target=self.__think_loop,
+                                              name="think_loop")
+        self._think_thread.daemon = True
 
         # set connected state.  done last to prevent state inconsistency if
         # something goes wrong beforehand.
@@ -117,7 +118,7 @@ class Agent:
         # tell the thread that it should be running, then start it
         self.__thinking = True
         self.__should_think_on_data = True
-        self.__think_thread.start()
+        self._think_thread.start()
 
     def disconnect(self):
         """
@@ -148,11 +149,11 @@ class Agent:
         # tell our threads to join, but only wait breifly for them to do so.
         # don't join them if they haven't been started (this can happen if
         # disconnect is called very quickly after connect).
-        if self.__msg_thread.is_alive():
-            self.__msg_thread.join(0.01)
+        if self._msg_thread.is_alive():
+            self._msg_thread.join(0.01)
 
-        if self.__think_thread.is_alive():
-            self.__think_thread.join(0.01)
+        if self._think_thread.is_alive():
+            self._think_thread.join(0.01)
 
         # reset all standard variables in this object.  self.__connected gets
         # reset here, along with all other non-user defined internal variables.
@@ -227,7 +228,7 @@ class Agent:
         """
 
         # DEBUG:  tells us if a thread dies
-        if not self.__think_thread.is_alive() or not self.__msg_thread.is_alive():
+        if not self._think_thread.is_alive() or not self._msg_thread.is_alive():
             raise Exception("A thread died.")
 
         # take places on the field by uniform number
