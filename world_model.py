@@ -40,7 +40,7 @@ class WorldModel:
 
         def __init__(self):
             raise NotImplementedError("Don't instantiate a PlayModes class,"
-                    " access it statically through WorldModel instead.")
+                                      " access it statically through WorldModel instead.")
 
     class RefereeMessages:
         """
@@ -65,7 +65,7 @@ class WorldModel:
 
         def __init__(self):
             raise NotImplementedError("Don't instantiate a RefereeMessages class,"
-                    " access it statically through WorldModel instead.")
+                                      " access it statically through WorldModel instead.")
 
     def __init__(self, action_handler):
         """
@@ -168,7 +168,7 @@ class WorldModel:
 
             # generate points every 'angle_step' degrees around each flag,
             # discarding those off-field.
-            for i in xrange(0, 360, angle_step):
+            for i in range(0, 360, angle_step):
                 dy = f.distance * math.sin(math.radians(i))
                 dx = f.distance * math.cos(math.radians(i))
 
@@ -206,7 +206,7 @@ class WorldModel:
 
         # generate initial random centers, ignoring identical ones
         centers = set([])
-        for i in xrange(int(math.sqrt(len(points) / 2))):
+        for i in range(int(math.sqrt(len(points) / 2))):
             # a random coordinate somewhere within the field boundaries
             rand_center = (random.randint(-55, 55), random.randint(-35, 35))
             centers.add(rand_center)
@@ -214,7 +214,7 @@ class WorldModel:
         # cluster for some iterations before the latest result
         latest = {}
         cur = {}
-        for i in xrange(num_cluster_iterations):
+        for i in range(num_cluster_iterations):
             # initialze cluster lists
             for c in centers:
                 cur[c] = []
@@ -223,7 +223,7 @@ class WorldModel:
             for p in points:
                 # get a list of (distance to center, center coords) tuples
                 c_dists = map(lambda c: (self.euclidean_distance(c, p), c),
-                             centers)
+                              centers)
 
                 # find the smallest tuple's c (second item)
                 nearest_center = min(c_dists)[1]
@@ -263,12 +263,15 @@ class WorldModel:
         Returns the Euclidean distance between two points on a plane.
         """
 
-        x1 = point1[0]
-        y1 = point1[1]
-        x2 = point2[0]
-        y2 = point2[1]
+        try:
+            x1 = point1[0]
+            y1 = point1[1]
+            x2 = point2[0]
+            y2 = point2[1]
 
-        return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+            return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+        except BaseException:
+            return 200
 
     def angle_between_points(self, point1, point2):
         """
@@ -278,21 +281,24 @@ class WorldModel:
         and relative to the positive x-axis.
         """
 
-        x1 = point1[0]
-        y1 = point1[1]
-        x2 = point2[0]
-        y2 = point2[1]
+        try:
+            x1 = point1[0]
+            y1 = point1[1]
+            x2 = point2[0]
+            y2 = point2[1]
 
-        # get components of vector between the points
-        dx = x2 - x1
-        dy = y2 - y1
+            # get components of vector between the points
+            dx = x2 - x1
+            dy = y2 - y1
 
-        # return the angle in degrees
-        a = math.degrees(math.atan2(dy, dx))
-        if a < 0:
-            a = 360 + a
+            # return the angle in degrees
+            a = math.degrees(math.atan2(dy, dx))
+            if a < 0:
+                a = 360 + a
 
-        return a
+            return a
+        except BaseException:
+            return 0
 
     def process_new_info(self, ball, flags, goals, players, lines):
         """
@@ -338,7 +344,7 @@ class WorldModel:
         ko_left = WorldModel.PlayModes.KICK_OFF_L
         ko_right = WorldModel.PlayModes.KICK_OFF_R
 
-        print self.play_mode
+        # print self.play_mode
 
         # return whether we're on the side that's kicking off
         return (self.side == WorldModel.SIDE_L and self.play_mode == ko_left or
@@ -415,7 +421,7 @@ class WorldModel:
         # difference bewteen actual aceivable power and maxpower.
         required_power = dist_ratio * self.server_parameters.maxpower
         effective_power = self.get_effective_kick_power(self.ball,
-                required_power)
+                                                        required_power)
         required_power += 1 - (effective_power / required_power)
 
         # add more power!
@@ -438,7 +444,7 @@ class WorldModel:
         # first we get effective kick power:
         # limit kick_power to be between minpower and maxpower
         kick_power = max(min(power, self.server_parameters.maxpower),
-                self.server_parameters.minpower)
+                         self.server_parameters.minpower)
 
         # scale it by the kick_power rate
         kick_power *= self.server_parameters.kick_power_rate
@@ -595,7 +601,7 @@ class ServerParameters:
         self.coach_w_referee = 0
         self.connect_wait = 300
         self.control_radius = 2
-        self.dash_power_rate =0.006
+        self.dash_power_rate = 0.006
         self.drop_ball_time = 200
         self.effort_dec = 0.005
         self.effort_dec_thr = 0.3
@@ -732,4 +738,3 @@ class ServerParameters:
         self.wind_none = 0
         self.wind_rand = 0
         self.wind_random = 0
-
