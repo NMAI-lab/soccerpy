@@ -41,6 +41,13 @@ class Agent:
         self.enemy_goal_pos = None
         self.own_goal_pos = None
 
+        # An object for the decorator to insert the env and act parameters in,
+        # for agents that operate using a neural network.
+        class Cls(object):
+            pass
+
+        self.ctx = Cls()
+
     def connect(self, host, port, teamname, version=11):
         """
         Gives us a connection to the server as one player on a team.  This
